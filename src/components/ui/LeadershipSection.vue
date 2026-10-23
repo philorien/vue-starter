@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useIntersectionObserver } from '@vueuse/core'
+import { useReveal } from '@/composables/useReveal'
 import LeadershipCard from './LeadershipCard.vue'
 import type { TeamMember } from './LeadershipCard.vue'
 
@@ -13,14 +12,7 @@ const props = withDefaults(defineProps<{
   subtitle: 'The visionaries driving us forward.'
 })
 
-const sectionRef = ref<HTMLElement | null>(null)
-const isVisible = ref(false)
-
-useIntersectionObserver(sectionRef, ([entry]) => {
-  if (entry?.isIntersecting && !isVisible.value) {
-    isVisible.value = true
-  }
-}, { threshold: 0.1 })
+const { isVisible } = useReveal('sectionRef')
 </script>
 
 <template>

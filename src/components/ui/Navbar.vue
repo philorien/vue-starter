@@ -1,22 +1,17 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { useWindowScroll } from '@vueuse/core'
+import { useWindowScroll, useScrollLock } from '@vueuse/core'
 import { Menu, X } from 'lucide-vue-next'
+import { site, nav } from '@/config/site'
 
-const navLinks = [
-  { title: 'Home', href: '#' },
-  { title: 'Testimonials', href: '#testimonials' },
-  { title: 'Gallery', href: '#gallery' },
-  { title: 'Features', href: '#features' },
-  { title: 'Leadership', href: '#leadership' },
-  { title: 'FAQ', href: '#faq' },
-]
+const navLinks = nav.links
 
 const isOpen = ref(false)
 const isHidden = ref(false)
 const menuTriggerRef = ref<HTMLButtonElement | null>(null)
 
 const { y } = useWindowScroll()
+const scrollLocked = useScrollLock(typeof document === 'undefined' ? null : document.body)
 
 watch(y, (latest, previous) => {
   if (latest > (previous ?? 0) && latest > 150) {
@@ -29,12 +24,8 @@ watch(y, (latest, previous) => {
 
 // Focus returning and body scroll locking
 watch(isOpen, (newVal) => {
-  if (newVal) {
-    document.body.style.overflow = 'hidden'
-  } else {
-    document.body.style.overflow = 'auto'
-    menuTriggerRef.value?.focus()
-  }
+  scrollLocked.value = newVal
+  if (!newVal) menuTriggerRef.value?.focus()
 })
 
 const handleEscape = (e: KeyboardEvent) => {
@@ -47,7 +38,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleEscape)
-  document.body.style.overflow = 'auto'
 })
 </script>
 
@@ -65,7 +55,7 @@ onUnmounted(() => {
         class="relative z-50 text-2xl tracking-tighter text-neutral-900 select-none mix-blend-difference font-space-grotesk font-medium"
         @click="isOpen = false"
       >
-        LORIEN.
+        {{ site.wordmark }}
       </a>
 
       <!-- Desktop Navigation -->
@@ -80,8 +70,8 @@ onUnmounted(() => {
           <span class="absolute inset-x-4 -bottom-1 h-px bg-neutral-900/50 scale-x-0 group-hover:scale-x-100 transition-transform origin-left ease-out duration-300" />
         </a>
         <div class="w-px h-4 bg-neutral-300 mx-2" />
-        <a href="#contact" class="px-5 py-2 text-sm font-semibold text-white bg-brand-green rounded-full hover:bg-brand-green-hover transition-colors shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent">
-          Get Started
+        <a :href="nav.cta.href" class="px-5 py-2 text-sm font-semibold text-white bg-brand-green rounded-full hover:bg-brand-green-hover transition-colors shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/50 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent">
+          {{ nav.cta.title }}
         </a>
       </div>
 
@@ -136,11 +126,11 @@ onUnmounted(() => {
           :style="{ animationDelay: `${navLinks.length * 0.1}s`, opacity: 0 }"
         >
           <a 
-            href="#contact"
+            :href="nav.cta.href"
             @click="isOpen = false"
             class="px-8 py-4 text-lg font-semibold text-white bg-brand-green rounded-full hover:bg-brand-green-hover active:scale-95 transition-colors shadow-md"
           >
-            Get Started
+            {{ nav.cta.title }}
           </a>
         </div>
       </div>

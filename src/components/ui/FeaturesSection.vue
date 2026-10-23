@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { ref, type Component } from 'vue'
-import { useIntersectionObserver } from '@vueuse/core'
+import type { Component } from 'vue'
+import { useReveal } from '@/composables/useReveal'
 
 export interface Feature {
   id: string
   title: string
   description: string
   icon: Component
-  color?: string
 }
 
 const props = withDefaults(defineProps<{
@@ -15,33 +14,14 @@ const props = withDefaults(defineProps<{
   title?: string
   subtitle?: string
 }>(), {
-  title: 'Why Choose Lorien',
-  subtitle: 'Everything you need to build stunning digital experiences, engineered for perfect performance and effortless scale.'
+  title: 'Why Use This Starter',
+  subtitle: 'The parts that are easy to get wrong, already handled.'
 })
 
-const headerRef = ref<HTMLElement | null>(null)
-const isHeaderVisible = ref(false)
-useIntersectionObserver(headerRef, ([entry]) => {
-  if (entry?.isIntersecting && !isHeaderVisible.value) {
-    isHeaderVisible.value = true
-  }
-}, { threshold: 0.1 })
+const { isVisible: isHeaderVisible } = useReveal('headerRef')
 
-const gridRef = ref<HTMLElement | null>(null)
-const isGridVisible = ref(false)
-useIntersectionObserver(gridRef, ([entry]) => {
-  if (entry?.isIntersecting && !isGridVisible.value) {
-    isGridVisible.value = true
-  }
-}, { threshold: 0.1 })
+const { isVisible: isGridVisible } = useReveal('gridRef')
 
-const getTintColors = (color?: string) => {
-  if (!color) return {}
-  return {
-    borderColor: `color-mix(in srgb, ${color} 30%, transparent)`,
-    backgroundColor: `color-mix(in srgb, ${color} 10%, transparent)`
-  }
-}
 </script>
 
 <template>
@@ -83,14 +63,13 @@ const getTintColors = (color?: string) => {
           >
             <!-- Icon Container -->
             <div 
-              class="w-12 h-12 rounded-xl border border-neutral-200 bg-neutral-50 flex items-center justify-center mb-6 transition-colors duration-300"
-              :style="getTintColors(feature.color)"
+              class="w-12 h-12 rounded-xl border border-brand-green/30 bg-brand-green-light flex items-center justify-center mb-6 transition-colors duration-300"
             >
               <component 
                 :is="feature.icon" 
                 :size="24" 
-                class="text-neutral-800 transition-colors duration-300" 
-                :style="feature.color ? { color: feature.color } : {}"
+                class="text-brand-green"
+                aria-hidden="true"
               />
             </div>
 

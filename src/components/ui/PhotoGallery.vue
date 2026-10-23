@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onUnmounted, useId } from 'vue'
 import { Maximize2, X } from 'lucide-vue-next'
-import { useIntersectionObserver } from '@vueuse/core'
+import { useScrollLock } from '@vueuse/core'
+import { useReveal } from '@/composables/useReveal'
 import { cn } from '@/lib/utils'
 
 export interface GalleryImage {
@@ -27,65 +28,50 @@ const selectedImage = ref<GalleryImage | null>(null)
 const previousFocusRef = ref<HTMLElement | null>(null)
 const closeButtonRef = ref<HTMLButtonElement | null>(null)
 
-watch(selectedImage, async (newVal) => {
-  if (newVal) {
-    previousFocusRef.value = document.activeElement as HTMLElement | null
-    document.body.style.overflow = 'hidden'
-    await nextTick()
-    closeButtonRef.value?.focus()
-  } else {
-    document.body.style.overflow = 'unset'
-    previousFocusRef.value?.focus()
-    previousFocusRef.value = null
-  }
-})
+const uid = useId()
+const dialogRef = ref<HTMLElement | null>(null)
+const scrollLocked = useScrollLock(typeof document === 'undefined' ? null : document.body)
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (!selectedImage.value) return
   if (e.key === 'Escape') {
     selectedImage.value = null
     return
   }
-  if (e.key !== 'Tab') return
-  const dialog = document.getElementById('photo-gallery-dialog')
-  if (!dialog) return
-  const focusable = dialog.querySelectorAll<HTMLElement>(
+  if (e.key !== 'Tab' || !dialogRef.value) return
+  const focusable = dialogRef.value.querySelectorAll<HTMLElement>(
     'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
   )
   if (focusable.length === 0) return
 
   const first = focusable[0]
   const last = focusable[focusable.length - 1]
-  
-  if (e.shiftKey) {
-    if (document.activeElement === first) {
-      e.preventDefault()
-      last?.focus()
-    }
-  } else {
-    if (document.activeElement === last) {
-      e.preventDefault()
-      first?.focus()
-    }
+
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault()
+    last?.focus()
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault()
+    first?.focus()
   }
 }
 
-watch(selectedImage, (newVal) => {
+watch(selectedImage, async (newVal) => {
+  scrollLocked.value = !!newVal
   if (newVal) {
+    previousFocusRef.value = document.activeElement as HTMLElement | null
     window.addEventListener('keydown', handleKeyDown)
+    await nextTick()
+    closeButtonRef.value?.focus()
   } else {
     window.removeEventListener('keydown', handleKeyDown)
+    previousFocusRef.value?.focus()
+    previousFocusRef.value = null
   }
 })
 
-const sectionRef = ref<HTMLElement | null>(null)
-const isVisible = ref(false)
+onUnmounted(() => window.removeEventListener('keydown', handleKeyDown))
 
-useIntersectionObserver(sectionRef, ([entry]) => {
-  if (entry?.isIntersecting && !isVisible.value) {
-    isVisible.value = true
-  }
-}, { threshold: 0.1 })
+const { isVisible } = useReveal('sectionRef')
 </script>
 
 <template>
@@ -160,12 +146,12 @@ useIntersectionObserver(sectionRef, ([entry]) => {
       >
         <div
           v-if="selectedImage"
-          id="photo-gallery-dialog"
+          ref="dialogRef"
           role="dialog"
           aria-modal="true"
-          :aria-labelledby="selectedImage.title ? 'lightbox-title' : undefined"
+          :aria-labelledby="selectedImage.title ? `${uid}-title` : undefined"
           :aria-label="selectedImage.title ? undefined : selectedImage.alt"
-          :aria-describedby="selectedImage.description ? 'lightbox-desc' : undefined"
+          :aria-describedby="selectedImage.description ? `${uid}-desc` : undefined"
           class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 md:p-8"
           @click="selectedImage = null"
         >
@@ -202,10 +188,10 @@ useIntersectionObserver(sectionRef, ([entry]) => {
               </div>
 
               <div v-if="selectedImage.title || selectedImage.description" class="w-full mt-6 text-center">
-                <h3 v-if="selectedImage.title" id="lightbox-title" class="text-2xl font-bold text-white mb-2">
+                <h3 v-if="selectedImage.title" :id="`${uid}-title`" class="text-2xl font-bold text-white mb-2">
                   {{ selectedImage.title }}
                 </h3>
-                <p v-if="selectedImage.description" id="lightbox-desc" class="text-neutral-400 max-w-2xl mx-auto">
+                <p v-if="selectedImage.description" :id="`${uid}-desc`" class="text-neutral-400 max-w-2xl mx-auto">
                   {{ selectedImage.description }}
                 </p>
               </div>

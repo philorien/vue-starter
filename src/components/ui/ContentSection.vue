@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useIntersectionObserver } from '@vueuse/core'
+import { computed } from 'vue'
+import { useReveal } from '@/composables/useReveal'
 import { ArrowRight } from 'lucide-vue-next'
 
 const props = withDefaults(defineProps<{
@@ -23,14 +23,7 @@ const props = withDefaults(defineProps<{
 
 const isImageLeft = computed(() => props.imagePosition === 'left')
 
-const sectionRef = ref<HTMLElement | null>(null)
-const isVisible = ref(false)
-
-useIntersectionObserver(sectionRef, ([entry]) => {
-  if (entry?.isIntersecting && !isVisible.value) {
-    isVisible.value = true
-  }
-}, { threshold: 0.1 })
+const { isVisible } = useReveal('sectionRef')
 </script>
 
 <template>

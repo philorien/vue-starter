@@ -7,14 +7,14 @@ const props = withDefaults(defineProps<{
   title: string
   subtitle: string
   backgroundImageUrl: string
+  badge?: string
   ctaText?: string
+  ctaHref?: string
 }>(), {
-  ctaText: 'Explore'
+  badge: 'Welcome',
+  ctaText: 'Explore',
+  ctaHref: '#main-content'
 })
-
-const emit = defineEmits<{
-  ctaClick: []
-}>()
 
 const { y } = useWindowScroll()
 const { height: windowHeight } = useWindowSize()
@@ -45,11 +45,11 @@ const contentStyle = computed(() => ({
 
 <template>
   <section 
-    class="relative w-full h-screen overflow-hidden bg-white"
+    class="relative w-full h-screen h-dvh overflow-hidden bg-white"
   >
     <!-- Background Image Layer with Parallax Y offset -->
     <div 
-      class="absolute inset-0 w-full h-full pointer-events-none"
+      class="absolute inset-0 w-full h-full pointer-events-none will-change-transform"
       :style="backgroundStyle"
     >
       <div class="absolute inset-0 bg-white/30 z-10" /> <!-- Light Overlay -->
@@ -68,7 +68,7 @@ const contentStyle = computed(() => ({
     >
       <div class="fade-up-enter" style="animation-delay: 0.2s; opacity: 0;">
         <span class="inline-block py-1 px-3 rounded-full bg-neutral-900/10 backdrop-blur-md border border-neutral-900/20 text-neutral-800 text-sm font-medium tracking-widest uppercase mb-6">
-          Welcome to the Future
+          {{ badge }}
         </span>
       </div>
 
@@ -86,16 +86,16 @@ const contentStyle = computed(() => ({
         {{ subtitle }}
       </p>
 
-      <button
-        @click="emit('ctaClick')"
-        class="fade-up-enter group relative px-8 py-4 bg-brand-green text-white rounded-full font-bold uppercase tracking-wider overflow-hidden shadow-sm hover:bg-brand-green-hover hover:shadow-md active:scale-95 transition-all"
+      <a
+        :href="ctaHref"
+        class="inline-block fade-up-enter group relative px-8 py-4 bg-brand-green text-white rounded-full font-bold uppercase tracking-wider overflow-hidden shadow-sm hover:bg-brand-green-hover hover:shadow-md active:scale-95 transition-all"
         style="animation-delay: 0.8s; opacity: 0;"
       >
         <span class="relative z-10 flex items-center gap-2">
           {{ ctaText }}
           <ChevronDown :size="18" class="group-hover:translate-y-1 transition-transform" aria-hidden="true" />
         </span>
-      </button>
+      </a>
     </div>
 
     <!-- Scroll indicator -->

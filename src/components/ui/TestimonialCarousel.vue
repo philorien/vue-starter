@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { ref, watch } from 'vue'
 import emblaCarouselVue from 'embla-carousel-vue'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
-import { useIntersectionObserver } from '@vueuse/core'
+import { useReveal } from '@/composables/useReveal'
 import TestimonialCard from './TestimonialCard.vue'
 import type { Testimonial } from './TestimonialCard.vue'
 import { cn } from '@/lib/utils'
@@ -19,10 +19,13 @@ const props = withDefaults(defineProps<{
 })
 
 const [emblaRef, emblaApi] = emblaCarouselVue({
-  loop: true,
+  loop: false,
   align: 'center',
   skipSnaps: false
 })
+
+// emblaRef is bound in the template (ref="emblaRef"); read it so noUnusedLocals stays happy.
+void emblaRef
 
 const prevBtnDisabled = ref(true)
 const nextBtnDisabled = ref(true)
@@ -39,26 +42,14 @@ const onSelect = () => {
   nextBtnDisabled.value = !emblaApi.value.canScrollNext()
 }
 
-// Dummy read to satisfy ts-plugin unused ref error
-watchEffect(() => {
-  if (emblaRef.value) { /* */ }
-})
-
-watchEffect(() => {
-  if (!emblaApi.value) return
+watch(emblaApi, (api, _prev, onCleanup) => {
+  if (!api) return
   onSelect()
-  emblaApi.value.on('reInit', onSelect)
-  emblaApi.value.on('select', onSelect)
-})
+  api.on('reInit', onSelect).on('select', onSelect)
+  onCleanup(() => api.off('reInit', onSelect).off('select', onSelect))
+}, { immediate: true })
 
-const sectionRef = ref<HTMLElement | null>(null)
-const isVisible = ref(false)
-
-useIntersectionObserver(sectionRef, ([entry]) => {
-  if (entry?.isIntersecting && !isVisible.value) {
-    isVisible.value = true
-  }
-}, { threshold: 0.1 })
+const { isVisible } = useReveal('sectionRef')
 </script>
 
 <template>
@@ -79,13 +70,14 @@ useIntersectionObserver(sectionRef, ([entry]) => {
         </p>
       </div>
 
-      <div class="relative">
+      <div class="relative" role="region" aria-roledescription="carousel" aria-label="Testimonials">
         <!-- Embla Viewport -->
         <div class="overflow-hidden cursor-grab active:cursor-grabbing" ref="emblaRef">
           <div class="flex -ml-4 md:-ml-6 items-stretch">
             <div 
               v-for="(testimonial, index) in testimonials"
               :key="testimonial.id"
+              role="group" aria-roledescription="slide" :aria-label="`${index + 1} of ${testimonials.length}`"
               class="pl-4 md:pl-6 min-w-[300px] flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.333%]"
             >
               <div
