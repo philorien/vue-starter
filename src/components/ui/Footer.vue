@@ -1,32 +1,6 @@
 <script setup lang="ts">
-import { Twitter, Linkedin, Facebook, Instagram, ArrowRight } from 'lucide-vue-next'
-
-const footerLinks = {
-  product: [
-    { name: 'Features', href: '#' },
-    { name: 'Integrations', href: '#' },
-    { name: 'Pricing', href: '#' },
-    { name: 'Changelog', href: '#' },
-  ],
-  company: [
-    { name: 'About Us', href: '#' },
-    { name: 'Careers', href: '#' },
-    { name: 'Blog', href: '#' },
-    { name: 'Contact', href: '#' },
-  ],
-  legal: [
-    { name: 'Privacy Policy', href: '#' },
-    { name: 'Terms of Service', href: '#' },
-    { name: 'Cookie Policy', href: '#' },
-  ],
-}
-
-const socialLinks = [
-  { name: 'Twitter', icon: Twitter, href: '#' },
-  { name: 'LinkedIn', icon: Linkedin, href: '#' },
-  { name: 'Facebook', icon: Facebook, href: '#' },
-  { name: 'Instagram', icon: Instagram, href: '#' },
-]
+import { ArrowRight } from 'lucide-vue-next'
+import { site, footer } from '@/config/site'
 
 const currentYear = new Date().getFullYear()
 </script>
@@ -39,26 +13,28 @@ const currentYear = new Date().getFullYear()
         <!-- Brand & Newsletter Column -->
         <div class="lg:col-span-2">
           <a href="/" class="inline-block text-3xl tracking-tighter text-neutral-900 mb-6 font-space-grotesk font-medium">
-            LORIEN.
+            {{ site.wordmark }}
           </a>
           <p class="text-neutral-600 text-sm leading-relaxed mb-8 max-w-sm">
-            Crafting premium digital experiences that elevate brands and engage audiences. Built for the future of the web.
+            {{ site.tagline }}
           </p>
           
-          <div class="space-y-4">
+          <form v-if="footer.newsletter?.action" :action="footer.newsletter.action" method="post" class="space-y-4">
             <h4 class="text-sm font-semibold text-neutral-900 uppercase tracking-wider">Subscribe to our newsletter</h4>
             <div class="flex relative max-w-md">
               <label for="footer-email" class="sr-only">Email address for newsletter</label>
               <input
                 id="footer-email"
+                name="email"
                 type="email"
+                required
                 placeholder="Enter your email"
                 autocomplete="email"
                 aria-describedby="newsletter-desc"
                 class="w-full bg-white border border-neutral-200 rounded-full py-3 px-6 text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-brand-green/50 focus:border-brand-green/50 transition-colors"
                />
               <button
-                type="button"
+                type="submit"
                 class="absolute right-1 top-1 bottom-1 aspect-square bg-brand-green text-white rounded-full flex items-center justify-center hover:bg-brand-green-hover active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                 aria-label="Subscribe to newsletter"
               >
@@ -66,37 +42,15 @@ const currentYear = new Date().getFullYear()
               </button>
             </div>
             <p id="newsletter-desc" class="sr-only">We'll send you updates and news. You can unsubscribe at any time.</p>
-          </div>
+          </form>
         </div>
 
         <!-- Links Columns -->
-        <div>
-          <h4 class="text-sm font-semibold text-neutral-900 uppercase tracking-wider mb-6">Product</h4>
+        <div v-for="col in footer.columns" :key="col.title">
+          <h4 class="text-sm font-semibold text-neutral-900 uppercase tracking-wider mb-6">{{ col.title }}</h4>
           <ul class="space-y-4">
-            <li v-for="link in footerLinks.product" :key="link.name">
-              <a :href="link.href" class="text-neutral-500 hover:text-brand-green transition-colors text-sm font-medium">
-                {{ link.name }}
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 class="text-sm font-semibold text-neutral-900 uppercase tracking-wider mb-6">Company</h4>
-          <ul class="space-y-4">
-            <li v-for="link in footerLinks.company" :key="link.name">
-              <a :href="link.href" class="text-neutral-500 hover:text-brand-green transition-colors text-sm font-medium">
-                {{ link.name }}
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 class="text-sm font-semibold text-neutral-900 uppercase tracking-wider mb-6">Legal</h4>
-          <ul class="space-y-4">
-            <li v-for="link in footerLinks.legal" :key="link.name">
-              <a :href="link.href" class="text-neutral-500 hover:text-brand-green transition-colors text-sm font-medium">
+            <li v-for="link in col.links" :key="link.name">
+              <a :href="link.href" class="text-neutral-600 hover:text-brand-green transition-colors text-sm font-medium">
                 {{ link.name }}
               </a>
             </li>
@@ -106,13 +60,13 @@ const currentYear = new Date().getFullYear()
 
       <!-- Bottom Bar -->
       <div class="pt-8 border-t border-neutral-200 flex flex-col md:flex-row justify-between items-center gap-6">
-        <p class="text-neutral-500 text-sm">
-          &copy; {{ currentYear }} Lorien Digital. All rights reserved.
+        <p class="text-neutral-600 text-sm">
+          &copy; {{ currentYear }} {{ site.legalName }}. All rights reserved.
         </p>
         
         <div class="flex items-center gap-4">
           <a
-            v-for="social in socialLinks"
+            v-for="social in footer.social"
             :key="social.name"
             :href="social.href"
             target="_blank"

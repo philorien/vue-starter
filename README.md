@@ -7,7 +7,7 @@ A high-performance, design-first Vue 3 starter template configured for building 
 - **Framework:** [Vue 3](https://vuejs.org/) (Composition API & `<script setup>`)
 - **Build Tool:** [Vite](https://vitejs.dev/)
 - **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
-- **Typography:** [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk) (Brand/Logos) & [Geist](https://vercel.com/font) (Body/UI)
+- **Typography:** Space Grotesk (brand/logos) and Geist (body/UI), both self-hosted via `@fontsource`
 - **Icons:** [Lucide Vue](https://lucide.dev/guide/packages/lucide-vue-next)
 - **Animation/Carousels:** [Embla Carousel Vue](https://www.embla-carousel.com/)
 
@@ -16,10 +16,21 @@ A high-performance, design-first Vue 3 starter template configured for building 
 This template strictly adheres to a premium, minimalist architectural color rule to ensure the interface never feels overwhelming:
 
 - **90% Neutrals:** The foundation. Extensive use of `neutral-50` and `white` for clean, spacious layouts. Backgrounds heavily alternate between these two to create section rhythm without relying on borders.
-- **8% Brand Green (`#00A878`):** The primary accent. Used exclusively for primary call-to-actions, active states, focus rings, hover effects on links, and specific semantic highlights (like kickers or roles).
+- **8% Brand Green (`#007A5A`):** The primary accent. Used exclusively for primary call-to-actions, active states, focus rings, hover effects on links, and specific semantic highlights (like kickers or roles).
 - **2% Brand Orange (`#FF9800`):** The rare exception. Reserved _strictly_ for critical alerts or extremely specific conversion drivers that must break the green hierarchy.
 
+Brand green is tuned to pass WCAG AA (4.5:1) with white text. Do not lighten it for text or buttons.
+
 _Note: Decorative background gradients, colored shadows, and glowing orbs are intentionally omitted from this template to maintain a sharp, "clean-tech" aesthetic._
+
+## ✏️ Customizing content
+
+All copy, links, and sample data live in `src/config/site.ts` (nav, hero, features, testimonials, gallery, team, FAQ, contact, footer). Components read from it, so you rarely edit templates.
+
+- **Contact form:** set `contact.formEndpoint` (Formspree, Getform, your own API). Empty runs a demo that sends nothing.
+- **Newsletter:** set `footer.newsletter.action` to show the footer form. Leave it empty to hide it.
+- **Scroll reveals:** `useReveal('refName')` in `src/composables/useReveal.ts`.
+- **Dark mode:** not implemented. The page declares `color-scheme: light`.
 
 ## 💡 When to use this template?
 
