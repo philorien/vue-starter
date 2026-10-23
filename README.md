@@ -2,6 +2,15 @@
 
 A design-first Vue 3 starter for marketing sites, landing pages, and small SPAs. It ships a full page of sections (hero, testimonials, content, gallery, features, team, FAQ, contact, footer) driven by one content file, with accessibility and performance handled up front.
 
+![Hero section of the starter](docs/screenshot-hero.webp)
+
+<details>
+<summary>Full page preview</summary>
+
+![Full page preview of the starter](docs/screenshot-full.webp)
+
+</details>
+
 ## Tech Stack
 
 - **Framework:** [Vue 3](https://vuejs.org/) (Composition API, `<script setup>`, TypeScript)
@@ -32,6 +41,7 @@ src/
   style.css             Tailwind import, brand tokens, global rules
   assets/hero.webp      Hero background (replace with your own)
 public/favicon.svg      Placeholder favicon
+docs/                   README screenshots (retake after visual changes)
 index.html              Title, description, and Open Graph tags
 ```
 
