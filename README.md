@@ -2,6 +2,8 @@
 
 A design-first Vue 3 starter for marketing sites, landing pages, and small SPAs. It ships a full page of sections (hero, testimonials, content, gallery, features, team, FAQ, contact, footer) driven by one content file, with accessibility and performance handled up front.
 
+**[Live demo](https://vue-starter-khaki.vercel.app)** · **[Use this template](https://github.com/new?template_name=vue-starter&template_owner=philorien)**
+
 ![Hero section of the starter](docs/screenshot-hero.webp)
 
 <details>
@@ -41,7 +43,7 @@ src/
   style.css             Tailwind import, brand tokens, global rules
   assets/hero.webp      Hero background (replace with your own)
 public/favicon.svg      Placeholder favicon
-docs/                   README screenshots (retake after visual changes)
+docs/                   README screenshots and GitHub social preview image (retake after visual changes)
 index.html              Title, description, and Open Graph tags
 ```
 
